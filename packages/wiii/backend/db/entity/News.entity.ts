@@ -4,11 +4,13 @@
  * - 사용자가 북마크한 뉴스만 DB에 따로 저장
  */
 import { NewsData } from '../../../domain/newsData';
-import { Column, Entity, Index } from 'typeorm';
+import { Column, Entity, Index, ObjectID, ObjectIdColumn } from 'typeorm';
 import Base from './Base.entity';
 
 @Entity({ database: 'mongodb', name: 'News' })
 export class News extends Base implements NewsData {
+  @ObjectIdColumn()
+  ojbId: ObjectID;
   /**
    * @property
    * news id
