@@ -2,21 +2,10 @@ import { Module } from 'vuex';
 import { AxiosStatic } from 'axios';
 import { RootState } from '@/store';
 
-import { getMarketNews, getCompanyNews } from '@/services/news';
-import { marketEnum } from '../../../domain/newsData';
+import { getMarketNews, getCompanyNews, toggleNewsLikes, setBookmarkNews } from '@/services/news';
+import { marketEnum, NewsData } from '../../../domain/newsData';
 
 declare const Axios: AxiosStatic;
-
-interface NewsData {
-  id: number;
-  category: string;
-  headline: string;
-  summarty: string;
-  datetime: number;
-  image: string;
-  source: string;
-  url: string;
-}
 
 interface CachingMarketNews {
   [category: string]: any[];
@@ -54,8 +43,6 @@ const News = {
       try {
         const results = await getMarketNews(category);
         commit('cacheMarketNews', { category, data: results });
-
-        console.log({ results });
         if (!results) return [];
         return results;
       } catch (e) {
@@ -67,7 +54,6 @@ const News = {
       if (!symbol) return;
       try {
         const results = await getCompanyNews(symbol, from, to);
-        console.log({ results });
         if (!results) return [];
         return results;
       } catch (e) {
@@ -80,14 +66,15 @@ const News = {
     },
 
     /** 북마크 */
-    // toggleBookmarkAction: (_, newsId: string) => {
-    //   if (!newsId) return false;
-    //   try {
-    //     toggleBookmark(newsId);
-    //   } catch (e) {
-    //     return console.error(e);
-    //   }
-    // },
+    toggleBookmarkAction: async ({ state }, { id, likes, update }) => {
+      if (!id) return false;
+      try {
+        if (likes === 0 && update === 1) await setBookmarkNews(state.currentModalNews);
+        toggleNewsLikes(id, update);
+      } catch (e) {
+        return console.error(e);
+      }
+    },
   } /** actions */,
 } as Module<NewsState, RootState>;
 
