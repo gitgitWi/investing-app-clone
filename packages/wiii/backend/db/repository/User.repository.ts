@@ -67,4 +67,28 @@ export class UserRepository extends MongoRepository<User> {
   /**
    * @todo user delete
    */
+
+  /**
+   * updateBookmarkNews
+   * 사용자 뉴스 북마크 저장 객체 업데이트
+   * @param email 사용자 email
+   * @param docId 뉴스 id
+   */
+  public async updateBookmarkNews(email: string, docId: number, update: number) {
+    const { bookmarkNews } = await this.findOne({ email });
+
+    if (update === 1) return this.updateOne({ email }, { $set: { bookmarkNews: { ...bookmarkNews, [docId]: docId } } });
+
+    const markedIds = Object.keys(bookmarkNews);
+    if (!markedIds.length) return;
+
+    const strDocId = docId.toString();
+
+    const rest = markedIds.reduce((acc, cur) => {
+      if (strDocId !== cur) acc[cur] = cur;
+      return acc;
+    }, {});
+
+    return this.updateOne({ email }, { $set: { bookmarkNews: rest } });
+  }
 }
