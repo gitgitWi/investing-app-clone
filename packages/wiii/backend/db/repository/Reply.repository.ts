@@ -1,6 +1,8 @@
-import { Reply } from '../entity/Reply.entity';
-import { MongoRepository, EntityRepository, getCustomRepository } from 'typeorm';
+import { ObjectID } from 'mongodb';
+import { EntityRepository, getCustomRepository, MongoRepository } from 'typeorm';
+
 import { RepoError } from '../../utils/error/api';
+import { Reply } from '../entity/Reply.entity';
 import { UserRepository } from './User.repository';
 
 /**
@@ -92,4 +94,14 @@ export class ReplyRepository extends MongoRepository<Reply> {
   //     return;
   //   }
   // }
+
+  /**
+   * 사용자가 좋아요 누른 댓글 목록 선택
+   * @param ids
+   * @returns id로 찾은 전체 댓글 목록
+   */
+  public selectReplyByIDs(ids: string[]) {
+    const objIds = ids.map((id) => new ObjectID(id));
+    return this.find({ where: { _id: { $in: objIds } }, order: { updatedAt: 'DESC' } });
+  }
 }
