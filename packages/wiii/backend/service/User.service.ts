@@ -1,12 +1,7 @@
-import {
-  getMongoRepository as getRepository,
-  getMongoManager as getManager,
-  MongoRepository,
-  getCustomRepository,
-} from 'typeorm';
+import { getCustomRepository } from 'typeorm';
 import { Service } from 'zum-portal-core/backend/decorator/Alias';
 import { ApiError } from '../utils/error/api';
-import { UserRepository } from '../db/';
+import { UserRepository, NewsRepository } from '../db/';
 
 /**
  * @description
@@ -24,14 +19,9 @@ export class UserService {
    * @return DB 쿼리 결과에 따라 true/void
    */
   public async createUser({ nickname, email, password }) {
-    const createError = () => this.error(`Save New User`, this.createUser.name);
-    try {
-      const result = await getCustomRepository(UserRepository).createUser({ nickname, email, password });
-      if (!result) throw createError();
-      return true;
-    } catch (e) {
-      return console.error(e);
-    }
+    const result = await getCustomRepository(UserRepository).createUser({ nickname, email, password });
+    if (!result) return;
+    return true;
   }
 
   /**
@@ -41,4 +31,21 @@ export class UserService {
   /**
    * @todo deleteUser
    */
+
+  /**
+   * setNewsLikes
+   * 뉴스 북마크
+   */
+  public setNewsLikes(email: string, id: string, update: number) {
+    getCustomRepository(UserRepository).updateBookmarkNews(email, id, update);
+    getCustomRepository(NewsRepository).updateNewsLikes(Number(id), update);
+  }
+
+  /**
+   * setMarketLikes
+   * 개별 종목 북마크
+   */
+  public setMarketLikes(email: string, docId: string) {
+    //
+  }
 }
