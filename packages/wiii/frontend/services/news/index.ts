@@ -1,5 +1,5 @@
 import { AxiosStatic } from 'axios';
-import { marketEnum } from '../../../domain/newsData';
+import { marketEnum, NewsData } from '../../../domain/newsData';
 
 declare const Axios: AxiosStatic;
 
@@ -18,8 +18,12 @@ export const getMarketNews = async (category: marketEnum = marketEnum.general) =
   return data;
 };
 
-export const getCompanyNews = async (symbol, from?: string, to?: string) => {
-  const { data, status, statusText } = await Axios.get(`${newsUrl}/company/${symbol}`, { params: { from, to } });
+export const getCompanyNews = async (symbol, dateFrom?: string, dateTo?: string) => {
+  const { data, status, statusText } = await Axios.get(`${newsUrl}/company/${symbol}`, { params: { dateFrom, dateTo } });
   if (status >= 400) throw Error(statusText);
   return data;
 };
+
+export const setBookmarkNews = (props: NewsData) => Axios.post(`${newsUrl}/`, props);
+
+export const toggleNewsLikes = (id: number, update: number) => Axios.post(`/api/user/likes/news`, { id, update });
