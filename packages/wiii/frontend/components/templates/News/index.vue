@@ -40,7 +40,7 @@ export default Vue.extend({
 
   async beforeMount() {
     this.newsList = await this.getMarketNewsAction(this.category as marketEnum);
-    this.loading = this.newsList.length === 0;
+    this.loading = false;
   },
 });
 </script>

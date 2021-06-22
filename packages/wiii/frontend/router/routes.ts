@@ -25,7 +25,7 @@ export default [
     component: () => import('@/views/News.vue'),
     children: [
       /**  뉴스 상세 페이지 */
-      { path: ':newsid', component: () => import('@/components/templates/News/Detail.vue'), props: true },
+      // { path: ':newsid', component: () => import('@/components/templates/News/Detail.vue'), props: true },
       /** 뉴스 홈; 뉴스 리스트 */
       { path: '', component: () => import('@/components/templates/News/index.vue') },
     ],

@@ -10,7 +10,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapGetters, mapActions } from 'vuex';
 
 import Header from '@/components/organisms/Header.vue';
 import Footer from '@/components/organisms/Footer.vue';
