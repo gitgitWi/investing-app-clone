@@ -16,14 +16,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapActions, createNamespacedHelpers } from 'vuex';
+import { mapState as RootState, mapActions, createNamespacedHelpers } from 'vuex';
 import { RootActions, StoreNames } from '@/store';
 
 import Button from '@/components/atoms/Button.vue';
 import Words from '@/components/atoms/Words.vue';
 import Reply from '@/components/organisms/ReplySection.vue';
 
-const { mapState } = createNamespacedHelpers(StoreNames.News);
+const { mapState, mapActions: mapNewsActions } = createNamespacedHelpers(StoreNames.News);
 
 export default Vue.extend({
   name: 'NewsModal',
@@ -33,6 +33,7 @@ export default Vue.extend({
   data() {
     return {
       id: undefined,
+      category: undefined,
       headline: undefined,
       image: undefined,
       summary: undefined,
@@ -45,15 +46,17 @@ export default Vue.extend({
   },
 
   computed: {
+    ...RootState(['auth']),
     ...mapState(['currentModalNews']),
   },
 
   watch: {
     currentModalNews() {
-      const { id, headline, image, summary, source, url, datetime, likes, userLiked } = this.currentModalNews;
+      const { id, category, headline, image, summary, source, url, datetime, likes, userLiked } = this.currentModalNews;
       if (!id) return;
 
       this.id = id;
+      this.category = category;
       this.headline = headline;
       this.image = image;
       this.summary = summary;
@@ -70,14 +73,19 @@ export default Vue.extend({
   methods: {
     ...mapActions([RootActions.SET_CURRENT_TICKER]),
 
+    ...mapNewsActions(['toggleBookmarkAction', 'getMarketNewsAction']),
+
     openOrigin() {
       window.open(this.url);
     },
 
     toggleLikes() {
-      const { likes, userLiked } = this;
-      this.likes = likes + (userLiked ? -1 : +1);
+      if (!this.auth) return;
+      const { likes, userLiked, id } = this;
+      const update = userLiked ? -1 : +1;
+      this.likes = likes + update;
       this.userLiked = !userLiked;
+      this.toggleBookmarkAction({ id, likes, update });
     },
   },
 });
