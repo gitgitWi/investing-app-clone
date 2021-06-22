@@ -1,11 +1,12 @@
-import { Controller, GetMapping, PostMapping } from 'zum-portal-core/backend/decorator/Controller';
-import { Inject } from 'zum-portal-core/backend/decorator/Alias';
 import { Request, Response } from 'express';
+import { Inject } from 'zum-portal-core/backend/decorator/Alias';
+import { Controller, GetMapping, PostMapping } from 'zum-portal-core/backend/decorator/Controller';
+
+import { verifyToken } from '../../backend/utils/auth/jwt';
+import { TOKEN_COOKIE_KEY } from '../config/auth';
 import { UserService } from '../service/User.service';
 import { ApiError } from '../utils/error/api';
-import { TOKEN_COOKIE_KEY } from '../config/auth';
 import { VerifiedToken } from './Reply.controller';
-import { verifyToken } from '../../backend/utils/auth/jwt';
 
 export const enum BookmarkTypes {
   news = 'news',
@@ -80,7 +81,6 @@ export class UserController {
    * 북마크
    * setNewsLikes
    * setMarketLikes
-   * 반환값 필요 없으므로 async-await 사용 X
    * @todo 댓글 controller에 있는 댓글 좋아요 기능과 통합
    * @example
    * /api/user/likes/news
@@ -89,11 +89,7 @@ export class UserController {
   public setBookmarks({ body: { id, update }, params: { type }, cookies }: Request, res: Response) {
     if (!id || !type || !update) res.status(404).send({ message: `종목명/뉴스 아이디 또는 북마크 숫자가 없습니다` });
 
-    const token = cookies[TOKEN_COOKIE_KEY];
-    if (!token) res.status(401).send({ messsage: `로그인 정보가 없습니다` });
-
-    const { data: email } = verifyToken(token) as VerifiedToken;
-    if (!email) res.status(401).send({ messsage: `로그인 정보가 없습니다` });
+    const email = this.checkAuth(cookies, res);
 
     const bookmarkServieMap = {
       [BookmarkTypes.news]: this.service.setNewsLikes,
@@ -102,9 +98,37 @@ export class UserController {
 
     try {
       bookmarkServieMap[type as BookmarkTypes](email, id, Number(update));
+      res.sendStatus(200);
     } catch (e) {
       console.error(e);
       res.sendStatus(500);
     }
+  }
+
+  /**
+   * 사용자 페이지에서 보여줄 북마크/좋아요 전체 조회
+   * @example
+   * /api/user/likes
+   */
+  @GetMapping({ path: ['/likes/'] })
+  public async getBookmarks({ cookies }: Request, res: Response) {
+    try {
+      const email = this.checkAuth(cookies, res);
+      const bookmarks = await this.service.getAllBookmarks(email);
+      res.json(bookmarks);
+    } catch (e) {
+      console.error(e);
+      res.sendStatus(500);
+    }
+  }
+
+  private checkAuth(cookies, res: Response) {
+    const token = cookies[TOKEN_COOKIE_KEY];
+    if (!token) res.status(401).send({ messsage: `로그인 정보가 없습니다` });
+
+    const { data: email } = verifyToken(token) as VerifiedToken;
+    if (!email) res.status(401).send({ messsage: `로그인 정보가 없습니다` });
+
+    return email;
   }
 }
