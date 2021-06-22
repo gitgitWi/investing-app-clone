@@ -10,7 +10,7 @@ import Base from './Base.entity';
 @Entity({ database: 'mongodb', name: 'News' })
 export class News extends Base implements NewsData {
   @ObjectIdColumn()
-  ojbId: ObjectID;
+  objId: ObjectID;
   /**
    * @property
    * news id

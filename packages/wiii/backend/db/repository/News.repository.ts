@@ -20,9 +20,13 @@ export class NewsRepository extends MongoRepository<News> {
    * @description
    * - 첫 북마크 되는 경우 DB에 내용 저장
    */
-  public insertNews(props: NewsData): void {
+  public async insertNews(props: NewsData): Promise<void> {
     const { id, headline } = props;
     if (!id || !headline.trim().length) return;
+
+    /** 중복체크 */
+    const exist = await this.findOne({ id });
+    if (exist) return;
 
     /** 반환값 불필요하므로 await 제거 */
     const news = this.create(props);
@@ -34,10 +38,8 @@ export class NewsRepository extends MongoRepository<News> {
    * - id 배열에 해당하는 뉴스 불러오기
    * - 사용자 북마크 전체 로딩
    */
-  public async selectNewsByIDs(ids: number[]): Promise<News[] | void> {
-    const results = await this.find({ where: { id: { $in: ids } }, order: { datetime: 'DESC' } });
-    /** @todo 콘솔 삭제 */
-    return results;
+  public selectNewsByIDs(ids: number[]): Promise<News[] | void> {
+    return this.find({ where: { id: { $in: ids } }, order: { updatedAt: 'DESC' } });
   }
 
   /**
@@ -47,8 +49,7 @@ export class NewsRepository extends MongoRepository<News> {
    * @param update 좋아요 +1 / -1
    */
   public async updateNewsLikes(id: number, update: number) {
-    const news = await this.findOne({ where: { id } });
-    const { likes } = news;
+    const { likes } = await this.findOne({ where: { id } });
     this.updateOne({ id }, { $set: { likes: likes + update } });
   }
 }
