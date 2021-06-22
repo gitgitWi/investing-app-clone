@@ -1,7 +1,9 @@
 import 'reflect-metadata';
 import { appContainer } from './AppContainer';
-import { getMongoConnection, getRedisConnection, ReplyRepository, UserRepository } from './db/';
-import { Reply } from './db/entity/Reply.entity';
+import { getMongoConnection, getRedisConnection } from './db/';
+// import { News } from './db/entity/News.entity';
+// import { Reply } from './db/entity/Reply.entity';
+// import { User } from './db/entity/User.entity';
 
 (async () => {
   try {
@@ -10,6 +12,8 @@ import { Reply } from './db/entity/Reply.entity';
     console.info(`[DB] MongoDB Connected; '${mongoConn.name}'`);
     /** MongoDB 초기화 */
     // mongoConn.getMongoRepository(Reply).deleteMany({});
+    // mongoConn.getMongoRepository(User).deleteMany({});
+    // mongoConn.getMongoRepository(News).deleteMany({});
 
     // import('./db/dummy.js').then(async ({ default: data }) => {
     //   const result = await mongoConn.getCustomRepository(ReplyRepository).insertMany(data);
