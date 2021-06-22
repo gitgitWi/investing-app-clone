@@ -1,14 +1,13 @@
 import { config } from 'dotenv';
 import { resolve } from 'path';
 import { ConnectionOptions } from 'typeorm';
-import { IS_PRO_MODE } from '../../domain/utilFunc';
+
 import { User } from '../db/entity/User.entity';
 import { Reply } from '../db/entity/Reply.entity';
+import { News } from '../db/entity/News.entity';
 import { ClientOpts } from 'redis';
 
 config({ path: resolve(__dirname, './.db.env') });
-
-const BASE_CHARSET = 'utf8mb4_general_ci' as const;
 
 export const SECRET_KEY = process.env.SECRET_KEY;
 
@@ -28,7 +27,7 @@ export const MongoDBConnOptions: ConnectionOptions = {
   password: process.env.DOCKER_MONGO_PASS,
   logging: true,
   cache: true,
-  entities: [User, Reply],
+  entities: [User, Reply, News],
   // synchronize: process.env.NODE_ENV === 'production' ? false : true,
   useUnifiedTopology: true,
 };
