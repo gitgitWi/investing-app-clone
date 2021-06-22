@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
-import { Controller, GetMapping } from 'zum-portal-core/backend/decorator/Controller';
 import { Inject } from 'zum-portal-core/backend/decorator/Alias';
+import { Controller, GetMapping, PostMapping } from 'zum-portal-core/backend/decorator/Controller';
 
+import { verifyToken } from '../../backend/utils/auth/jwt';
+import { marketEnum } from '../../domain/newsData';
+import { TOKEN_COOKIE_KEY } from '../config/auth';
 import { NewsService } from '../service/News.service';
-import { marketEnum } from 'domain/newsData';
+import { VerifiedToken } from './Reply.controller';
 
 /**
  * @description
@@ -21,10 +24,16 @@ export class MarketController {
    * /api/news/market/crypto
    */
   @GetMapping({ path: ['/market/:category'] })
-  public async sendMarketNewsList({ params }: Request, res: Response) {
+  public async sendMarketNewsList({ params, cookies }: Request, res: Response) {
     try {
-      /** @todo 예외처리 */
-      const data = await this.newsService.getMarketNewsList(params.category as marketEnum);
+      let email = '';
+      const token = cookies[TOKEN_COOKIE_KEY];
+      if (token) {
+        const verified = verifyToken(token) as VerifiedToken;
+        email = verified.data;
+      }
+
+      const data = await this.newsService.getMarketNewsList(params.category as marketEnum, email);
       res.send(data);
     } catch (e) {
       console.error(e);
@@ -39,14 +48,37 @@ export class MarketController {
    * /api/news/company/005930
    */
   @GetMapping({ path: ['/company/:symbol'] })
-  public async sendCompanyNewsList({ params, query }: Request, res: Response) {
+  public async sendCompanyNewsList({ params, query, cookies }: Request, res: Response) {
     try {
       const { symbol } = params;
       const { dateFrom, dateTo } = query;
 
-      /** @todo 뉴스기사 없는 종목 예외처리 */
-      const data = await this.newsService.getCompanyNewsList(symbol, dateFrom as string, dateTo as string);
+      let email = '';
+      const token = cookies[TOKEN_COOKIE_KEY];
+      if (token) {
+        const verified = verifyToken(token) as VerifiedToken;
+        email = verified.data;
+      }
+
+      const data = await this.newsService.getCompanyNewsList(symbol, dateFrom as string, dateTo as string, email);
+
       res.send(data);
+    } catch (e) {
+      console.error(e);
+      res.sendStatus(500);
+    }
+  }
+
+  /**
+   * 신규 북마크 뉴스 생성
+   * @example
+   * /api/news/
+   */
+  @PostMapping({ path: ['/'] })
+  public setBookmarkNews({ body }: Request, res: Response) {
+    try {
+      this.newsService.createBookmarkNews(body);
+      res.sendStatus(200);
     } catch (e) {
       console.error(e);
       res.sendStatus(500);
