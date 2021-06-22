@@ -10,6 +10,7 @@ import { MongoDBConnOptions, RedisConnOptions } from '../config/db';
 
 export { UserRepository } from './repository/User.repository';
 export { ReplyRepository } from './repository/Reply.repository';
+export { NewsRepository } from './repository/News.repository';
 
 const { host, port } = RedisConnOptions;
 

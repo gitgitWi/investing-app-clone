@@ -1,4 +1,5 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { NewsData } from './../../../domain/newsData';
+import axios, { AxiosRequestConfig } from 'axios';
 import { marketEnum } from '../../../domain/newsData';
 import { FinnhubConfigs } from '../../config/market';
 
@@ -29,7 +30,7 @@ const companyUrl = `${BASE}company-news`;
  * @param category general (주식/지수) || crypto (코인)
  * @returns
  */
-export const getMarketNews = async (category: marketEnum) => {
+export const getMarketNews = async (category: marketEnum): Promise<NewsData[]> => {
   const config = setAxiosConfig({ category });
   const { data, status, statusText } = await axios.get(marketUrl, config);
 
@@ -44,7 +45,7 @@ export const getMarketNews = async (category: marketEnum) => {
  * @param to 이날까지; 기본값 오늘
  * @returns
  */
-export const getCompanyNews = async (symbol: string, from: string, to: string) => {
+export const getCompanyNews = async (symbol: string, from: string, to: string): Promise<NewsData[]> => {
   const config = setAxiosConfig({ symbol, from, to });
 
   const { data, status, statusText } = await axios.get(companyUrl, config);
