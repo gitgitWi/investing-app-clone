@@ -14,34 +14,7 @@ interface UserEntity {
 /**
  * User Model
  * @description
- * - for MongoDB User table
- * @example 생성결과
- * 
-  User {
-    email: 'test@com.comm',
-    password: '$2b$15$TDGoo9TWQOod/TUjy2ad.u.vNTeX/q1PMI3jo.q0Kez7M4s2qZ7hq',
-    nickname: 'hello',
-    createdAt: 2021-06-08T14:21:03.157Z,
-    updatedAt: 2021-06-08T14:21:03.157Z,
-    deletedAt: null,
-    provider: null,
-    repls: Reply {
-      docId: undefined,
-      userId: undefined,
-      content: undefined,
-      deletedAt: null,
-      parentReply: null
-    },
-    id: ObjectID {
-      _bsontype: 'ObjectID',
-      id: Buffer(12) [Uint8Array] [
-        96, 191, 124, 207, 237,
-        185, 211,  22, 135,  35,
-        69, 211
-      ]
-    }
-  }
- *
+ * - for MongoDB User Schema
  */
 @Entity({ database: 'mongodb', name: 'Users' })
 export class User extends Base implements UserEntity {
@@ -120,7 +93,7 @@ export class User extends Base implements UserEntity {
    * 북마크 뉴스
    */
   @Column({ default: {} })
-  bookmarkNews: {};
+  bookmarkNews: object;
 
   constructor(email: string, password: string, nickname: string) {
     super();
