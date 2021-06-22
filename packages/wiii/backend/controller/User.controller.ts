@@ -4,6 +4,13 @@ import { Request, Response } from 'express';
 import { UserService } from '../service/User.service';
 import { ApiError } from '../utils/error/api';
 import { TOKEN_COOKIE_KEY } from '../config/auth';
+import { VerifiedToken } from './Reply.controller';
+import { verifyToken } from '../../backend/utils/auth/jwt';
+
+export const enum BookmarkTypes {
+  news = 'news',
+  market = 'market',
+}
 
 /**
  * @description
@@ -68,4 +75,36 @@ export class UserController {
    * @todo
    * 회원 수정; Delete
    */
+
+  /**
+   * 북마크
+   * setNewsLikes
+   * setMarketLikes
+   * 반환값 필요 없으므로 async-await 사용 X
+   * @todo 댓글 controller에 있는 댓글 좋아요 기능과 통합
+   * @example
+   * /api/user/likes/news
+   */
+  @PostMapping({ path: ['/likes/:type'] })
+  public setBookmarks({ body: { id, update }, params: { type }, cookies }: Request, res: Response) {
+    if (!id || !type || !update) res.status(404).send({ message: `종목명/뉴스 아이디 또는 북마크 숫자가 없습니다` });
+
+    const token = cookies[TOKEN_COOKIE_KEY];
+    if (!token) res.status(401).send({ messsage: `로그인 정보가 없습니다` });
+
+    const { data: email } = verifyToken(token) as VerifiedToken;
+    if (!email) res.status(401).send({ messsage: `로그인 정보가 없습니다` });
+
+    const bookmarkServieMap = {
+      [BookmarkTypes.news]: this.service.setNewsLikes,
+      [BookmarkTypes.market]: this.service.setMarketLikes,
+    };
+
+    try {
+      bookmarkServieMap[type as BookmarkTypes](email, id, Number(update));
+    } catch (e) {
+      console.error(e);
+      res.sendStatus(500);
+    }
+  }
 }
