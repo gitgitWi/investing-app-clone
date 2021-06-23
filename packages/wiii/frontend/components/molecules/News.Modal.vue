@@ -111,7 +111,7 @@ export default Vue.extend({
     width: 60%;
     max-width: $max-width-mobile;
     height: max-content;
-    max-height: 600px;
+    max-height: 75%;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
