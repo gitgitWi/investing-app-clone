@@ -1,20 +1,6 @@
 <template>
   <main class="area">
-    <!-- <Chart class="card" :typeName="`stock`" :ticker="239340" :smaConfigs="[{}]" :width="200" /> -->
-    <!-- <Chart
-      class="card"
-      :typeName="`stock`"
-      :ticker="`239340`"
-      :smaConfigs="[
-        {
-          duration: 20,
-          color: `red`,
-          width: 10,
-        },
-      ]"
-      :width="200"
-    /> -->
-
+    <Chart class="card" v-bind="{ typeName, ticker }" :smaConfigs="[{}]" />
     <ReplySection />
   </main>
 </template>
@@ -30,6 +16,19 @@ export default Vue.extend({
   components: {
     Chart,
     ReplySection,
+  },
+
+  props: {
+    /** router로 전달받음 */
+    ticker: {
+      type: String,
+    },
+  },
+
+  data() {
+    return {
+      typeName: 'coin',
+    };
   },
 
   computed: {

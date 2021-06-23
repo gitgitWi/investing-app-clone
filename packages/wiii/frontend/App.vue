@@ -28,10 +28,11 @@ export default {
 
   beforeMount() {
     this.getAllStocks();
+    this.getAllCoins();
   },
 
   methods: {
-    ...mapActions(['getAllStocks']),
+    ...mapActions(['getAllStocks', 'getAllCoins']),
   },
 };
 </script>

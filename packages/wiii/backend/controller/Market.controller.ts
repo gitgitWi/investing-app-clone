@@ -167,10 +167,15 @@ export class MarketController {
     }
   }
 
-  @GetMapping({ path: [marketSubpaths.coins] })
+  /**
+   * 전체 코인 데이터 전송
+   * /api/markets/coins
+   */
+  @GetMapping({ path: ['/coins'] })
   public async sendCoinsList(req: Request, res: Response) {
     try {
-      /** @todo 코인 리스트 데이터 전송 */
+      const data = await this.marketService.getAllCoins();
+      res.send(data);
     } catch (e) {
       console.error(e);
       res.sendStatus(500);

@@ -14,7 +14,7 @@
       <div class="market-list-card-info-change noselect">
         <Words class="market-list-card-info-price"> 현재가 {{ currPrice }}원 {{ changeEmoji }} </Words>
         <Words class="market-list-card-info-text">
-          전일대비 {{ changeSign }}&nbsp;{{ changePrice }}원 / {{ changeSign }} {{ changePercent }} {{ changeText }}
+          전일대비 {{ changeSign }}&nbsp;{{ changePrice }}원 / {{ changeSign }} {{ changePercent }}% {{ changeText }}
         </Words>
       </div>
     </div>
@@ -76,26 +76,28 @@ export default Vue.extend({
     },
   },
 
+  methods: {
+    ...mapActions(['getTodayMiniStocks', 'getMiniCoins']),
+
+    setTicker() {
+      this.$store.dispatch(RootActions.SET_CURRENT_TICKER, this.ticker);
+    },
+  },
+
   async mounted() {
-    const { results } = await this.getTodayMiniStocks(this.ticker);
+    const { typeName, ticker } = this;
+
+    const { results, change, price } =
+      typeName === 'stock' ? await this.getTodayMiniStocks(ticker) : await this.getMiniCoins(ticker);
     if (!results?.length) {
       return (this.changeData = null);
     }
     const [today, dayBefore] = (this.changeData = results.slice(0, 2));
     const { adj_close: todayC } = today;
     const { adj_close: beforeC } = dayBefore;
-
     this.change = todayC - beforeC;
-    this.currPrice = todayC.toLocaleString();
-    this.changePercent = `${(abs(this.change / beforeC) * 100).toFixed(2)} %`;
-  },
-
-  methods: {
-    ...mapActions(['getTodayMiniStocks']),
-
-    setTicker() {
-      this.$store.dispatch(RootActions.SET_CURRENT_TICKER, this.ticker);
-    },
+    this.currPrice = price.toLocaleString();
+    this.changePercent = change;
   },
 });
 </script>

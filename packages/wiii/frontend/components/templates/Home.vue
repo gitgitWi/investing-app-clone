@@ -2,8 +2,8 @@
   <main class="area section">
     <Words class="subtitle noselect">국내주식</Words>
     <MarketList :tickers="sortedStockData.slice(0, 5)" />
-    <Words class="subtitle noselect">지수</Words>
-    <MarketList :tickers="sortedIndexData.slice(0, 5)" />
+    <!-- <Words class="subtitle noselect">지수</Words>
+    <MarketList :tickers="sortedIndexData.slice(0, 5)" /> -->
     <Words class="subtitle noselect">가상화폐</Words>
     <MarketList :tickers="sortedCoinData.slice(0, 5)" />
   </main>

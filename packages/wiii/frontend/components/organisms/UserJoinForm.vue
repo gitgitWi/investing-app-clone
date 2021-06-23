@@ -25,7 +25,7 @@
       @change-input-handler="(e) => changeInputHandler('nickname')(e)"
       required
     ></Input>
-    <Button type="submit" class="user-sign-button">가입하기</Button>
+    <Button type="submit" class="user-sign-button" :class="{ isSubmitting }">가입하기</Button>
   </form>
 </template>
 
@@ -50,6 +50,7 @@ export default Vue.extend({
       email: '',
       password: '',
       nickname: '',
+      isSubmitting: false,
     };
   },
 
@@ -58,10 +59,11 @@ export default Vue.extend({
 
     async joinSubmitHandler() {
       try {
+        this.isSubmitting = true;
         const { email, password, nickname } = this;
         const isOK = await this.postSignUp({ email, password, nickname });
-        console.log(isOK);
         if (!isOK) throw Error();
+        this.isSubmitting = false;
         alert('가입 성공');
         this.$router.push('/');
       } catch (e) {
@@ -76,4 +78,45 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.user-sign-button {
+  position: relative;
+  background-color: $green-500;
+
+  &.isSubmitting {
+    /** background */
+    &:before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      cursor: progress;
+      border-radius: $border-radius-10;
+      background-color: $green-500;
+    }
+
+    /** spinning circle */
+    &:after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 20px;
+      border: 2px solid $shallow-blue;
+      border-right-color: $green-100;
+      animation: spinner 1s cubic-bezier(0.74, 0.16, 0.55, 0.76) infinite;
+    }
+  }
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>

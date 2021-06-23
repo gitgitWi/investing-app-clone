@@ -14,7 +14,7 @@ import { IAggV2Formatted } from '@polygon.io/client-js/lib/rest/stocks/aggregate
 export interface CandleOne {
   open: number;
   close: number;
-  adj_close: number;
+  adj_close?: number;
   high: number;
   low: number;
   volume: number;

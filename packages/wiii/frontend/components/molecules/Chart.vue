@@ -160,7 +160,7 @@ export default Vue.extend({
   },
 
   methods: {
-    ...mapActions(['getTodayMiniStocks']),
+    ...mapActions(['getTodayMiniStocks', 'getMiniCoins']),
     /**
      * proxy observer 생성
      * @description
@@ -188,7 +188,8 @@ export default Vue.extend({
 
     async getStatic() {
       try {
-        const data = await this.getTodayMiniStocks(this.ticker);
+        const data =
+          this.typeName === 'stock' ? await this.getTodayMiniStocks(this.ticker) : await this.getMiniCoins(this.ticker);
         console.log({ data });
         this.histData.data = data;
       } catch (e) {

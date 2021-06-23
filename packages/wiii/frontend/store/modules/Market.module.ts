@@ -2,6 +2,7 @@ import { Module } from 'vuex';
 import { AxiosStatic } from 'axios';
 import { RootState } from '@/store';
 import { getStocksByTicker, getAllStocks } from '../../services/market/stocks';
+import { getAllCoins } from '../../services/market/coins';
 
 declare const Axios: AxiosStatic;
 
@@ -9,10 +10,10 @@ interface MarketState {
   stockOverviews: any;
   stockData: any;
   sortedStockData: Array<any>;
-  coinOverviews: any;
+  // coinOverviews: any;
   coinData: any;
   sortedCoinData: Array<any>;
-  indexOverviews: any;
+  // indexOverviews: any;
   indexData: any;
   sortedIndexData: Array<any>;
 }
@@ -24,10 +25,10 @@ const Market = {
     stockOverviews: {},
     stockData: {},
     sortedStockData: [],
-    indexOverviews: {},
+    // indexOverviews: {},
     indexData: {},
     sortedIndexData: [],
-    coinOverviews: {},
+    // coinOverviews: {},
     coinData: {},
     sortedCoinData: [],
   },
@@ -47,6 +48,14 @@ const Market = {
 
     setSortedStockData(state, payload) {
       state.sortedStockData = payload;
+    },
+
+    setCoinData(state, { key, value }) {
+      state.coinData[key] = value;
+    },
+
+    setSortedCoinData(state, payload) {
+      state.sortedCoinData = payload;
     },
   },
 
@@ -83,6 +92,27 @@ const Market = {
       } catch (e) {
         console.error(e);
       }
+    },
+
+    getAllCoins: async ({ commit }) => {
+      try {
+        const sortedCoins = await getAllCoins();
+        commit('setSortedCoinData', sortedCoins);
+
+        for (const coin of sortedCoins) {
+          const ticker = coin.ticker;
+          if (!ticker) continue;
+          commit('setCoinData', { key: ticker, value: coin });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    },
+
+    getMiniCoins: ({ state, commit }, ticker) => {
+      if (ticker in state.coinData) return state.coinData[ticker];
+      console.warn(`[Market:Module:getMiniCoins] getting uncached ticker data : ${ticker}`);
+      /** @todo 개별 코인 차트 데이터 가져오는 로직 */
     },
   },
 } as Module<MarketState, RootState>;

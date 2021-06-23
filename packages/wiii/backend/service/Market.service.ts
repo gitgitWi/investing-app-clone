@@ -1,3 +1,4 @@
+import { YEAR_ONE } from './../../domain/date';
 import { Service } from 'zum-portal-core/backend/decorator/Alias';
 import { Caching } from 'zum-portal-core/backend/decorator/Caching';
 
@@ -7,7 +8,11 @@ import { MINUTE_ONE, times } from '../../domain/date';
 import { devPrint, IS_PRO_MODE } from '../../domain/utilFunc';
 import { fetchHistoricalData as KRX } from './chart/KRX';
 import stocksList from './chart/KRXList';
+import coinsList from './chart/CoinList';
 import { getStockOverview } from './overview/stock';
+import { getCoinCandles } from './chart/Coin';
+
+const { floor } = Math;
 
 const fetchers = {
   [marketName.stocks]: KRX,
@@ -30,7 +35,8 @@ export class MarketService {
   /** @todo 개발 모드에서 300분 단위 캐싱 */
   private delay = MINUTE_ONE * 300;
   private lastRequest: number;
-  private cachedHistory = {};
+  private cachedStockHistory = {};
+  private cachedCoinHistory = {};
   private cachedOverview = {};
 
   constructor() /**
@@ -87,7 +93,7 @@ export class MarketService {
       const { type, ticker } = options;
 
       const requestTime = new Date().getTime();
-      const cached = this.cachedHistory[ticker];
+      const cached = this.cachedStockHistory[ticker];
       if (requestTime - this.lastRequest < this.delay && cached) return cached;
 
       /** response: data, status, statusText, headers, config */
@@ -97,40 +103,62 @@ export class MarketService {
       resultValidator(data, status, statusText);
 
       this.lastRequest = requestTime;
-      this.cachedHistory[ticker] = data;
+      this.cachedStockHistory[ticker] = data;
       return data;
     } catch (e) {
       return console.error(e);
     }
   }
 
-  private sortStocks() {
-    return Object.values(this.cachedHistory).sort(({ change: a }, { change: b }) => b - a);
+  private sortHistory(data) {
+    return Object.values(data).sort(({ change: a }, { change: b }) => b - a);
   }
 
-  @Caching({
-    refreshCron: IS_PRO_MODE ? `30 * * * * *` : `1 * * *`,
-    ttl: IS_PRO_MODE ? times.caching : times.caching * 300,
-    runOnStart: false,
-    unless: (result) => !result,
-  })
+  // @Caching({
+  //   refreshCron: IS_PRO_MODE ? `30 * * * * *` : `1 * * *`,
+  //   ttl: IS_PRO_MODE ? times.caching : times.caching * 300,
+  //   runOnStart: false,
+  //   unless: (result) => !result,
+  // })
   public async getAllStocks() {
     const baselist = IS_PRO_MODE ? stocksList : stocksList.slice(0, 2);
     const requestTime = new Date().getTime();
 
     for await (const { ticker, tickerName } of baselist) {
-      if (ticker in this.cachedHistory && requestTime - this.lastRequest < this.delay) continue;
+      if (ticker in this.cachedStockHistory && requestTime - this.lastRequest < this.delay) continue;
 
       const { data, status, statusText } = await KRX({ ticker, type: `stock` });
       if (status >= 400) throw Error(statusText);
-      this.cachedHistory[ticker] = { ticker, tickerName, ...data };
+      this.cachedStockHistory[ticker] = { ticker, tickerName, ...data };
 
       const overview = await getStockOverview(ticker);
       this.cachedOverview[ticker] = overview;
     }
 
-    console.log(`[Market:Service:Cached] ${Object.keys(this.cachedHistory)}`);
+    console.log(`[Market:Service:Cached] ${Object.keys(this.cachedStockHistory)}`);
 
-    return { hist: this.sortStocks(), overview: this.cachedOverview };
+    return { hist: this.sortHistory(this.cachedStockHistory), overview: this.cachedOverview };
+  }
+
+  /**
+   * Coin 목록 전체 데이터 요청
+   */
+  @Caching({
+    refreshCron: IS_PRO_MODE ? `60 * * * * *` : `1 * * *`,
+    ttl: IS_PRO_MODE ? times.caching : times.caching * 300,
+    runOnStart: false,
+    unless: (result) => !result,
+  })
+  public async getAllCoins() {
+    const to = floor(new Date().getTime() / 1_000);
+    const from = floor(to - (YEAR_ONE * 2) / 1_000);
+    const resolution = 'D';
+
+    for await (const { ticker, tickerName } of coinsList) {
+      const { data, status, statusText, request } = await getCoinCandles(ticker, resolution, from, to);
+      if (status >= 400) throw Error(statusText);
+      this.cachedCoinHistory[ticker] = { ticker, tickerName, ...data };
+    }
+    return this.sortHistory(this.cachedCoinHistory);
   }
 }

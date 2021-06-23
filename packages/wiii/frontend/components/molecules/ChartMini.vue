@@ -67,12 +67,14 @@ export default Vue.extend({
   async mounted() {
     const chart = this.$refs.canvas as HTMLCanvasElement;
     this.ctx = chart.getContext(CanvasOptionEnum.context2d);
-    this.chartData = await this.getTodayMiniStocks(this.ticker);
+    /** @todo 좀더 순수한 컴포넌트 만들기 위해 chartData도 props로 받아야 할 듯 */
+    this.chartData =
+      this.typeName === 'stock' ? await this.getTodayMiniStocks(this.ticker) : await this.getMiniCoins(this.ticker);
     this.getChart(this.chartData);
   },
 
   methods: {
-    ...mapActions(['getTodayMiniStocks']),
+    ...mapActions(['getTodayMiniStocks', 'getMiniCoins']),
 
     getChart({ results, count }) {
       /** @todo 예외처리 */
