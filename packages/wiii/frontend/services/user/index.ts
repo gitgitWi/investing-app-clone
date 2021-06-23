@@ -1,5 +1,6 @@
-import { SERVER_BASE_URL } from '../../../domain/apiUrls';
 import { AxiosStatic } from 'axios';
+
+import { IBookmarks } from './../../../domain/bookmarks';
 
 declare const Axios: AxiosStatic;
 
@@ -32,4 +33,10 @@ export const signup = async (email: string, password: string, nickname: string) 
   } catch (e) {
     return console.error(e);
   }
+};
+
+export const getBookmarks = async (): Promise<IBookmarks | void> => {
+  const { data, status, statusText } = await Axios.get(`/api/user/likes/`, { withCredentials: true });
+  if (status >= 400) throw Error(statusText);
+  return data;
 };

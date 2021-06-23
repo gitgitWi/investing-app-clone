@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex, { Store } from 'vuex';
 
 import Theme from '@/store/modules/Theme.module';
+import User from '@/store/modules/User.module';
 import Auth from '@/store/modules/Auth.module';
 import Reply from '@/store/modules/Reply.module';
 import Market from '@/store/modules/Market.module';
@@ -39,6 +40,7 @@ const store = new Store({
   modules: {
     Theme,
     Auth,
+    User,
     Reply,
     Market,
     News,
