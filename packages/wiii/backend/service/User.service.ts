@@ -75,7 +75,8 @@ export class UserService {
     };
 
     for await (const repo of repos) {
-      bookmarks[repo] = await getters[repo];
+      const data = await getters[repo];
+      if (data.length) bookmarks[repo] = data.map((d) => ({ ...d, userLike: true }));
     }
 
     return bookmarks;

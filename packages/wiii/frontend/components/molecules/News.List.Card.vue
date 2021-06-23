@@ -6,7 +6,7 @@
       <Words class="news-list-card-tag news-list-card-category" :class="categoryColor"> {{ category.toUpperCase() }} </Words>
       <Words class="news-list-card-tag news-list-card-source"> {{ source }} </Words>
       <Words class="news-list-card-tag news-list-card-date">{{ dateString }} </Words>
-      <Words class="news-list-card-tag news-list-card-likes" :class="{ userLiked }"> 🏷️ {{ likes }} </Words>
+      <Words class="news-list-card-tag news-list-card-likes" :class="{ userLike }"> 🏷️ {{ likes }} </Words>
     </div>
   </article>
 </template>
@@ -66,7 +66,7 @@ export default Vue.extend({
       type: Number,
       default: 0,
     },
-    userLiked: {
+    userLike: {
       type: Boolean,
       default: false,
     },
@@ -160,7 +160,7 @@ export default Vue.extend({
       color: $grey-300;
     }
 
-    &.userLiked {
+    &.userLike {
       background-color: rgba($red-a400, 0.4);
     }
   }

@@ -64,7 +64,6 @@ export class ReplyService {
     if (email !== userMail) throw likeError();
 
     /** 이미 좋아요 된 댓글에서 좋아요 취소 */
-    /** @todo custom repo에서 관련 method도 정의해서 활용 */
     if (replId in userLikes) {
       const updated = Object.keys(userLikes).reduce((acc, cur) => {
         if (cur !== replId) acc[cur] = cur;

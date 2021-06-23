@@ -8,7 +8,7 @@ export interface NewsData {
   source?: string;
   url?: string;
   likes?: number;
-  userLiked?: boolean;
+  userLike?: boolean;
 }
 
 export const enum marketEnum {

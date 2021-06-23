@@ -6,7 +6,7 @@
       <div class="news-company-card-tags noselect">
         <Words class="news-company-card-tag news-company-card-source"> {{ source }} </Words>
         <Words class="news-company-card-tag news-company-card-date">{{ dateString }} </Words>
-        <Words class="news-company-card-tag news-company-card-likes" :class="{ userLiked }"> 🏷️ {{ likes }} </Words>
+        <Words class="news-company-card-tag news-company-card-likes" :class="{ userLike }"> 🏷️ {{ likes }} </Words>
       </div>
     </div>
   </article>
@@ -59,7 +59,7 @@ export default Vue.extend({
       type: Number,
       default: 0,
     },
-    userLiked: {
+    userLike: {
       type: Boolean,
       default: false,
     },
@@ -148,7 +148,7 @@ export default Vue.extend({
       color: $grey-300;
     }
 
-    &.userLiked {
+    &.userLike {
       background-color: rgba($red-a400, 0.4);
     }
   }

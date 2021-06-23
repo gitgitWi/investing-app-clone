@@ -47,7 +47,7 @@ export class NewsService {
    *
    * @param data API로 받은 데이터 원본
    * @param email 사용자 이메일
-   * @returns Bookmark likes/userLiked 추가된 데이터
+   * @returns Bookmark likes/userLike 추가된 데이터
    */
   private async setNewsDataWithBookmark(data: NewsData[], email?: string): Promise<NewsData[]> {
     const newsIds = [];
@@ -74,7 +74,7 @@ export class NewsService {
     /** 로그인 정보 있는 경우 bookmark 데이터 가공 */
     if (email || email !== '') {
       const { bookmarkNews } = await getCustomRepository(UserRepository).findOne({ email });
-      data.forEach((d) => (d.userLiked = d.id in bookmarkNews));
+      data.forEach((d) => (d.userLike = d.id in bookmarkNews));
     }
 
     return data;

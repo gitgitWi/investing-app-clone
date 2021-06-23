@@ -6,7 +6,7 @@
       <Words id="news-modal-detail-headline">{{ headline }}</Words>
       <Words id="news-modal-detail-summary">{{ summary === 'Content' ? '기사내용이 없습니다.' : summary }}</Words>
       <div id="news-modal-detail-options">
-        <Words @click.native="toggleLikes" id="news-modal-detail-likes" :class="{ userLiked }"> 🏷️ {{ likes }} </Words>
+        <Words @click.native="toggleLikes" id="news-modal-detail-likes" :class="{ userLike }"> 🏷️ {{ likes }} </Words>
         <Words @click.native="openOrigin" id="news-modal-detail-origin"> 원문보기 ➡️ {{ source }} </Words>
       </div>
       <Reply />
@@ -41,7 +41,7 @@ export default Vue.extend({
       url: undefined,
       datetime: undefined,
       likes: 0,
-      userLiked: false,
+      userLike: false,
     };
   },
 
@@ -52,7 +52,7 @@ export default Vue.extend({
 
   watch: {
     currentModalNews() {
-      const { id, category, headline, image, summary, source, url, datetime, likes, userLiked } = this.currentModalNews;
+      const { id, category, headline, image, summary, source, url, datetime, likes, userLike } = this.currentModalNews;
       if (!id) return;
 
       this.id = id;
@@ -64,7 +64,7 @@ export default Vue.extend({
       this.url = url;
       this.datetime = datetime;
       this.likes = likes;
-      this.userLiked = userLiked;
+      this.userLike = userLike;
 
       this[RootActions.SET_CURRENT_TICKER](id?.toString());
     },
@@ -81,10 +81,10 @@ export default Vue.extend({
 
     toggleLikes() {
       if (!this.auth) return;
-      const { likes, userLiked, id } = this;
-      const update = userLiked ? -1 : +1;
+      const { likes, userLike, id } = this;
+      const update = userLike ? -1 : +1;
       this.likes = likes + update;
-      this.userLiked = !userLiked;
+      this.userLike = !userLike;
       this.toggleBookmarkAction({ id, likes, update });
     },
   },
@@ -200,7 +200,7 @@ export default Vue.extend({
         color: $grey-100;
       }
 
-      &.userLiked {
+      &.userLike {
         background-color: rgba($red-a400, 0.4);
         color: $red-a400;
       }
