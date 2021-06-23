@@ -8,10 +8,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapGetters, mapActions } from 'vuex';
 
-import Header from '@/components/organisms/Header';
-import Footer from '@/components/organisms/Footer';
+import Header from '@/components/organisms/Header.vue';
+import Footer from '@/components/organisms/Footer.vue';
 import { viewsTitle } from '@/type/views';
 
 export default Vue.extend({

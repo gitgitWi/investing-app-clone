@@ -42,36 +42,37 @@ export class MarketService {
   }
 
   /**
+   * @deprecated
    * getStockHistorical
    * 개별 주식, 지수, 코인 historical 데이터 axios.get & caching
    * @description
    * 실무에서는 webSocket 등 실시간 데이터 업데이트 해야 하지만
    * 파일럿 프로젝트에서는 무료 api를 사용하므로 사용량 제한 위해 캐싱 사용,
    */
-  @Caching({
-    /** 개발모드에서는 1시간에 한 번만 실행 */
-    refreshCron: IS_PRO_MODE ? `30 * * * * *` : `1 * * *`,
-    /** 캐싱 기간 초 단위 */
-    ttl: IS_PRO_MODE ? times.caching : times.caching * 60,
-    runOnStart: false,
-    unless: (result) => !result,
-  })
-  public async getHistorical(options: GetHistoricalOptions) {
-    try {
-      const { type, ticker } = options;
-      console.log({ options });
+  // @Caching({
+  //   /** 개발모드에서는 1시간에 한 번만 실행 */
+  //   refreshCron: IS_PRO_MODE ? `30 * * * * *` : `1 * * *`,
+  //   /** 캐싱 기간 초 단위 */
+  //   ttl: IS_PRO_MODE ? times.caching : times.caching * 60,
+  //   runOnStart: false,
+  //   unless: (result) => !result,
+  // })
+  // public async getHistorical(options: GetHistoricalOptions) {
+  //   try {
+  //     const { type, ticker } = options;
+  //     console.log({ options });
 
-      /** response: data, status, statusText, headers, config */
-      const { data, status, statusText } = await fetchers[type](options);
-      devPrint()({ type, ticker, status, statusText }, `getHistorical fetchers`);
+  //     /** response: data, status, statusText, headers, config */
+  //     const { data, status, statusText } = await fetchers[type](options);
+  //     devPrint()({ type, ticker, status, statusText }, `getHistorical fetchers`);
 
-      resultValidator(data, status, statusText);
+  //     resultValidator(data, status, statusText);
 
-      return data;
-    } catch (e) {
-      return console.error(e);
-    }
-  }
+  //     return data;
+  //   } catch (e) {
+  //     return console.error(e);
+  //   }
+  // }
 
   /**
    * getCachedHistorical
@@ -115,8 +116,11 @@ export class MarketService {
   })
   public async getAllStocks() {
     const baselist = IS_PRO_MODE ? stocksList : stocksList.slice(0, 2);
+    const requestTime = new Date().getTime();
 
     for await (const { ticker, tickerName } of baselist) {
+      if (ticker in this.cachedHistory && requestTime - this.lastRequest < this.delay) continue;
+
       const { data, status, statusText } = await KRX({ ticker, type: `stock` });
       if (status >= 400) throw Error(statusText);
       this.cachedHistory[ticker] = { ticker, tickerName, ...data };

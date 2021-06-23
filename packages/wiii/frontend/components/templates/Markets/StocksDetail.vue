@@ -3,10 +3,9 @@
     <Header v-bind="{ ...headerInfo }" />
     <PriceSummary v-bind="{ ...priceSummary }" />
     <Chart class="card" :typeName="`stock`" :apiType="`es`" :ticker="ticker" />
-
     <CompanyInfo v-bind="{ ...companyInfo }" />
     <News />
-    <ReplySection :ticker="ticker" />
+    <ReplySection />
   </div>
 </template>
 

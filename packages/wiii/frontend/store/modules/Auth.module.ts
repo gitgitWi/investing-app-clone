@@ -7,17 +7,9 @@ interface AuthState {}
 const AuthStore = {
   namespaced: true,
 
-  state: {
-    //
-  },
-
-  getters: {
-    //
-  },
-
-  mutations: {
-    //
-  },
+  state: {},
+  getters: {},
+  mutations: {},
 
   actions: {
     postLogin: async ({ rootState }, { email, password }) => {
@@ -36,7 +28,7 @@ const AuthStore = {
       /** @todo */
     },
 
-    postSignUp: async ({ state, commit }, { email, password, nickname }) => {
+    postSignUp: async (_, { email, password, nickname }) => {
       try {
         const result = await signup(email, password, nickname);
         if (!result) throw Error();

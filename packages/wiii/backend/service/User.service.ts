@@ -71,13 +71,11 @@ export class UserService {
     const bookmarks = {
       reply: [],
       news: [],
-      // ticker: []
+      ticker: [],
     };
 
     for await (const repo of repos) {
-      const data = await getters[repo];
-      console.table(data);
-      bookmarks[repo] = data;
+      bookmarks[repo] = await getters[repo];
     }
 
     return bookmarks;

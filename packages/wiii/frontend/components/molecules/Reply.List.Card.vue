@@ -16,7 +16,6 @@
       >
       <Button class="reply-rerepl" @click.native="inputToggle(replId)">대댓글 달기</Button>
     </div>
-    <ReplyForm v-if="curInputId === replId" @change-current-input="inputToggle" />
   </article>
 </template>
 
@@ -77,9 +76,6 @@ export default Vue.extend({
     likes: {
       type: Number,
       default: 0,
-    },
-    curInputId: {
-      type: String,
     },
   },
 

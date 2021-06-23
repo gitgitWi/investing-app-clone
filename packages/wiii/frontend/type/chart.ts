@@ -1,5 +1,3 @@
-import { IAggV2Formatted } from '@polygon.io/client-js/lib/rest/stocks/aggregates';
-
 import { CandleData } from '../../domain/marketData';
 
 export const enum ChartTypeEnums {
